@@ -412,13 +412,47 @@ def sample_qrdqn_params(trial: optuna.Trial) -> Dict[str, Any]:
     return hyperparams
 
 
+def sample_bdpi_params(trial: optuna.Trial) -> Dict[str, Any]:
+    """
+    Sampler for BDPI hyperparams.
+
+    :param trial:
+    :return:
+    """
+    threads = 1
+
+    learning_rate = trial.suggest_loguniform("learning_rate", 1e-5, 1)
+    actor_lr = trial.suggest_loguniform("actor_lr", 0.001, 1)
+    critic_lr = trial.suggest_loguniform("critic_lr", 0.001, 1)
+    batch_size = trial.suggest_categorical("batch_size", [64, 128, 256, 512, 1024])
+    buffer_size = trial.suggest_categorical("buffer_size", [int(1e4), int(1e5), int(1e6)])
+    learning_starts = trial.suggest_categorical("learning_starts", [0, 1000, 5000, 10000, 20000])
+    gradient_steps = trial.suggest_categorical("gradient_steps", [1, 4, 8, 16, 32, 64])
+    n_critics = trial.suggest_categorical("n_critics", [1, 4, 8, 16, 24, 32])
+
+    net_arch = trial.suggest_categorical("net_arch", ["tiny", "small", "medium"])
+    net_arch = {"tiny": [64], "small": [64, 64], "medium": [256, 256]}[net_arch]
+
+    hyperparams = {
+        "threads": threads,
+        "learning_rate": learning_rate,
+        "actor_lr": actor_lr,
+        "critic_lr": critic_lr,
+        "batch_size": batch_size,
+        "buffer_size": buffer_size,
+        "learning_starts": learning_starts,
+        "gradient_steps": gradient_steps,
+        "policy_kwargs": dict(net_arch=net_arch, n_critics=n_critics),
+    }
+
+    return hyperparams
+
+
 HYPERPARAMS_SAMPLER = {
     "a2c": sample_a2c_params,
-    "ddpg": sample_ddpg_params,
-    "dqn": sample_dqn_params,
-    "qrdqn": sample_qrdqn_params,
-    "sac": sample_sac_params,
     "tqc": sample_tqc_params,
     "ppo": sample_ppo_params,
     "td3": sample_td3_params,
+    "bdpi": sample_bdpi_params,
 }
+

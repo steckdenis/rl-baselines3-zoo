@@ -1,0 +1,20 @@
+atari:
+  env_wrapper:
+    - stable_baselines3.common.atari_wrappers.AtariWrapper
+  policy: 'CnnPolicy'
+  n_envs: 16
+  n_timesteps: !!float 1e7
+
+# Tuned
+LunarLander-v2:
+  n_envs: 1
+  n_timesteps: !!float 100000
+  policy: 'MlpPolicy'
+  actor_lr: 0.01
+  critic_lr: 0.234
+  batch_size: 256
+  buffer_size: 100000
+  gradient_steps: 64
+  learning_rate: 0.00026
+  policy_kwargs: "dict(net_arch=[64, 64], n_critics=8)"
+
